@@ -9,8 +9,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
-  // Para Vercel
-  outputFileTracing: true,
 };
 
 export default nextConfig;
