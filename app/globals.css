@@ -1,70 +1,40 @@
-/* app/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+/* Estilos base */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
-  color: #ffffff;
-  font-family: inherit;
   min-height: 100vh;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Estilos de accesibilidad */
-.font-size-normal {
-  font-size: 16px;
-}
-
-.font-size-large {
-  font-size: 20px;
-}
-
-.font-size-xlarge {
-  font-size: 24px;
-}
-
-/* Contraste alto */
-.high-contrast {
-  background-color: rgb(0, 0, 0) !important;
-  color: rgb(255, 255, 255) !important;
-}
-
-.high-contrast * {
-  color: rgb(255, 255, 255) !important;
-  border-color: rgb(255, 255, 255) !important;
-}
-
-/* Botones grandes para mejor accesibilidad */
-.btn-accessible {
-  min-height: 60px;
-  min-width: 200px;
-  font-size: 1.2rem;
-  border-radius: 12px;
-}
-
-/* Focus para navegación */
-*:focus {
-  outline: 3px solid #f97316;
-  outline-offset: 2px;
-}
-
-/* Animaciones */
+/* Animaciones personalizadas */
 @keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -75,36 +45,15 @@ html {
   }
 }
 
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-100px);
-  }
-  to {
-    opacity: 1;
+@keyframes shake {
+  0%, 100% {
     transform: translateX(0);
   }
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(100px);
+  25% {
+    transform: translateX(-10px);
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
+  75% {
+    transform: translateX(10px);
   }
 }
 
@@ -120,29 +69,21 @@ html {
   }
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-15px) scale(1.05);
-  }
-}
-
+/* Clases de utilidad para animaciones */
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.8s ease-out;
 }
 
-.animate-slide-left {
-  animation: slideInFromLeft 0.6s ease-out;
+.animate-slide-down {
+  animation: slideDown 0.5s ease-out;
 }
 
-.animate-slide-right {
-  animation: slideInFromRight 0.6s ease-out;
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
 }
 
-.animate-scale-in {
-  animation: scaleIn 0.6s ease-out;
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
 }
 
 .animate-blob {
@@ -155,57 +96,4 @@ html {
 
 .animation-delay-4000 {
   animation-delay: 4s;
-}
-
-/* Glassmorphism */
-.glass {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #f97316, #ec4899, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(30, 27, 75, 0.5);
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #f97316, #ec4899);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ea580c, #be185d);
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-  h1 {
-    font-size: 28px;
-  }
-
-  h2 {
-    font-size: 24px;
-  }
-
-  h3 {
-    font-size: 20px;
-  }
-}
-
-main {
-  background: transparent;
 }

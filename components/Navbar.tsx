@@ -9,19 +9,19 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav className="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-900 shadow-2xl sticky top-0 z-50 border-b border-purple-500/30 backdrop-blur">
-      <div className="container mx-auto px-4 py-4">
+    <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg">
-              <Sparkles className="w-7 h-7 text-white" />
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity group">
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all transform group-hover:scale-110">
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div className="hidden sm:block">
-              <div className="text-xl font-black bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+              <div className="text-lg font-black bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
                 Limpieza Fácil
               </div>
-              <div className="text-xs text-gray-400">Profesional & Rápido</div>
+              <div className="text-xs text-gray-400">Profesional & Moderno</div>
             </div>
           </Link>
 
@@ -30,25 +30,22 @@ export default function Navbar() {
             <Link href="/" className="text-gray-300 hover:text-orange-400 font-semibold transition-colors">
               Inicio
             </Link>
-            <Link href="/servicios" className="text-gray-300 hover:text-orange-400 font-semibold transition-colors">
-              Servicios
+            <Link href="#features" className="text-gray-300 hover:text-orange-400 font-semibold transition-colors">
+              Características
             </Link>
-            <Link href="/precios" className="text-gray-300 hover:text-orange-400 font-semibold transition-colors">
-              Precios
+            <Link href="#planes" className="text-gray-300 hover:text-orange-400 font-semibold transition-colors">
+              Planes
             </Link>
-            <Link href="/contacto" className="text-gray-300 hover:text-orange-400 font-semibold transition-colors">
-              Contacto
-            </Link>
-            <a href="tel:+34600123456" className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all transform hover:scale-105">
-              <Phone className="w-5 h-5" />
-              +34 600 123 456
+            <a href="tel:+34600123456" className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-2.5 rounded-lg font-bold hover:shadow-lg transition-all transform hover:scale-105">
+              <Phone className="w-4 h-4" />
+              Llamar
             </a>
           </div>
 
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 hover:bg-purple-500/20 rounded-lg transition-colors"
+            className="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             {isOpen ? (
               <X className="w-6 h-6 text-orange-400" />
@@ -60,20 +57,17 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden mt-4 pt-4 border-t border-purple-500/30 space-y-4">
+          <div className="md:hidden mt-4 pt-4 border-t border-white/10 space-y-3 animate-in">
             <Link href="/" className="block text-gray-300 hover:text-orange-400 font-semibold transition-colors">
               Inicio
             </Link>
-            <Link href="/servicios" className="block text-gray-300 hover:text-orange-400 font-semibold transition-colors">
-              Servicios
+            <Link href="#features" className="block text-gray-300 hover:text-orange-400 font-semibold transition-colors">
+              Características
             </Link>
-            <Link href="/precios" className="block text-gray-300 hover:text-orange-400 font-semibold transition-colors">
-              Precios
+            <Link href="#planes" className="block text-gray-300 hover:text-orange-400 font-semibold transition-colors">
+              Planes
             </Link>
-            <Link href="/contacto" className="block text-gray-300 hover:text-orange-400 font-semibold transition-colors">
-              Contacto
-            </Link>
-            <a href="tel:+34600123456" className="block w-full text-center bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all">
+            <a href="tel:+34600123456" className="block w-full text-center bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-2.5 rounded-lg font-bold hover:shadow-lg transition-all">
               Llamar Ahora
             </a>
           </div>

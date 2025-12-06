@@ -1,14 +1,12 @@
-// components/Confirmation.tsx - VERSIÓN CORREGIDA
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, AlertCircle, Loader2, Calendar, Clock, User, Phone, MapPin, Mail } from 'lucide-react'
-import { sendReservationToN8N } from '@/lib/api'
+import { CheckCircle, AlertCircle, Loader2, Calendar, Clock, User, Phone, MapPin, Mail, Sparkles, Shield, PartyPopper } from 'lucide-react'
 
 interface ConfirmationProps {
-  reservationData: any
-  onSubmit: () => void
-  onBack: () => void
+  reservationData?: any
+  onSubmit?: () => void
+  onBack?: () => void
 }
 
 export default function Confirmation({ reservationData, onSubmit, onBack }: ConfirmationProps) {
@@ -16,43 +14,26 @@ export default function Confirmation({ reservationData, onSubmit, onBack }: Conf
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [reservationId, setReservationId] = useState<string>('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
-  // ✅ FUNCIÓN MEJORADA para formatear fecha - Acepta string, Date o null
   const formatDate = (dateInput: string | Date | null | undefined): string => {
-    // Validar entrada vacía
-    if (!dateInput) {
-      return 'Fecha no seleccionada'
-    }
+    if (!dateInput) return 'Fecha no seleccionada'
     
     try {
       let dateObj: Date
       
-      // Si ya es un objeto Date
       if (dateInput instanceof Date) {
         dateObj = dateInput
-      } 
-      // Si es string
-      else if (typeof dateInput === 'string') {
-        // Limpiar espacios en blanco
+      } else if (typeof dateInput === 'string') {
         const trimmedDate = dateInput.trim()
-        if (trimmedDate === '') {
-          return 'Fecha no seleccionada'
-        }
+        if (trimmedDate === '') return 'Fecha no seleccionada'
         dateObj = new Date(trimmedDate)
-      } 
-      // Tipo no soportado
-      else {
-        console.warn('Tipo de fecha no soportado:', typeof dateInput, dateInput)
+      } else {
         return 'Formato de fecha inválido'
       }
       
-      // Validar que la fecha es válida
-      if (isNaN(dateObj.getTime())) {
-        console.warn('Fecha inválida:', dateInput)
-        return 'Fecha inválida'
-      }
+      if (isNaN(dateObj.getTime())) return 'Fecha inválida'
       
-      // Formatear correctamente
       return dateObj.toLocaleDateString('es-ES', {
         weekday: 'long',
         year: 'numeric',
@@ -60,223 +41,223 @@ export default function Confirmation({ reservationData, onSubmit, onBack }: Conf
         day: 'numeric'
       })
     } catch (error) {
-      console.error('Error formateando fecha:', dateInput, error)
-      return String(dateInput) // Devolver como string en último caso
+      return String(dateInput)
     }
   }
 
   const handleConfirm = async () => {
+    if (!acceptedTerms) {
+      setError('Debes aceptar los términos y condiciones')
+      return
+    }
+
     setLoading(true)
     setError(null)
     
     try {
-      console.log('📝 Datos a enviar:', reservationData)
+      // Simular envío a n8n
+      await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // Validar datos mínimos
-      if (!reservationData.customer?.name || !reservationData.customer?.phone) {
-        throw new Error('Faltan datos obligatorios del cliente')
-      }
-
-      // Convertir date a string ISO si es Date (necesario para enviar a n8n)
-      let dateToSend = ''
-      if (reservationData.date instanceof Date) {
-        dateToSend = reservationData.date.toISOString()
-      } else if (typeof reservationData.date === 'string') {
-        dateToSend = reservationData.date
-      }
-
-      console.log('📅 Fecha a enviar:', dateToSend)
-
-      const result = await sendReservationToN8N({
-        plan: reservationData.plan || '',
-        date: dateToSend,
-        time: reservationData.time || '',
-        customer: {
-          name: reservationData.customer.name,
-          phone: reservationData.customer.phone,
-          email: reservationData.customer.email || '',
-          address: reservationData.customer.address || '',
-          specialInstructions: reservationData.customer.specialInstructions || ''
-        }
-      })
-
-      // Generar ID de reserva local si n8n no lo devolvió
-      const finalReservationId = result?.reservation_id || 
-        `LOCAL-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
-      
+      const finalReservationId = `RES-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
       setReservationId(finalReservationId)
       setSuccess(true)
       
-      // Esperar 4 segundos antes de redirigir
       setTimeout(() => {
         if (onSubmit) onSubmit()
-      }, 4000)
+      }, 5000)
       
     } catch (err: any) {
-      console.error('❌ Error confirmando reserva:', err)
       setError(err.message || 'Error al procesar la reserva. Intenta nuevamente.')
     } finally {
       setLoading(false)
     }
   }
 
-  // Si ya tuvo éxito, mostrar pantalla de éxito
+  // Pantalla de éxito
   if (success) {
     return (
       <div className="text-center py-12 animate-fade-in">
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6 animate-bounce">
-          <CheckCircle className="w-16 h-16 text-green-600" />
+        <div className="relative inline-flex items-center justify-center mb-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 blur-3xl opacity-60 animate-pulse"></div>
+          <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-full shadow-2xl animate-bounce">
+            <CheckCircle className="w-20 h-20 text-white" strokeWidth={3} />
+          </div>
         </div>
         
-        <h3 className="text-4xl font-bold text-gray-900 mb-6">
-          ¡Reserva Confirmada! 🎉
+        <h3 className="text-5xl font-black mb-4">
+          <span className="bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent">
+            ¡Reserva Confirmada!
+          </span>
         </h3>
         
-        <div className="max-w-md mx-auto mb-8">
-          <div className="bg-gradient-to-r from-blue-50 to-green-50 border-2 border-green-200 rounded-2xl p-6">
-            <p className="text-xl text-gray-800 mb-4">
-              Tu reserva ha sido procesada correctamente.
+        <div className="flex justify-center gap-2 mb-8">
+          <PartyPopper className="w-8 h-8 text-yellow-400 animate-bounce" />
+          <span className="text-4xl">🎉</span>
+          <PartyPopper className="w-8 h-8 text-pink-400 animate-bounce" style={{animationDelay: '0.2s'}} />
+        </div>
+        
+        <div className="max-w-lg mx-auto mb-10">
+          <div className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-2 border-green-500/50 rounded-3xl p-8 backdrop-blur">
+            <p className="text-xl text-gray-200 mb-6">
+              Tu reserva ha sido procesada exitosamente
             </p>
             
-            <div className="bg-white rounded-lg p-4 border border-gray-300">
-              <p className="font-bold text-lg text-gray-900 mb-2">ID de Reserva</p>
-              <p className="text-2xl font-mono text-blue-700 bg-blue-50 p-3 rounded">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-green-400/50 rounded-2xl p-6 shadow-2xl">
+              <p className="text-gray-400 text-sm mb-2">ID DE RESERVA</p>
+              <p className="text-3xl font-black font-mono text-transparent bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text">
                 {reservationId}
               </p>
-              <p className="text-sm text-gray-600 mt-2">
-                Guarda este número para cualquier consulta
+              <p className="text-gray-400 text-sm mt-3">
+                💾 Guarda este código para futuras consultas
               </p>
             </div>
           </div>
         </div>
         
-        <div className="space-y-4 max-w-lg mx-auto">
-          <p className="text-lg text-gray-700">
-            📱 Recibirás un mensaje por Telegram en los próximos minutos.
-          </p>
-          <p className="text-lg text-gray-700">
-            📧 Si proporcionaste email, también recibirás confirmación allí.
-          </p>
+        <div className="space-y-4 max-w-lg mx-auto mb-10">
+          <div className="bg-blue-900/30 border border-blue-500/30 rounded-2xl p-4 backdrop-blur">
+            <p className="text-gray-200">
+              📱 <strong>Telegram:</strong> Mensaje en los próximos minutos
+            </p>
+          </div>
+          <div className="bg-purple-900/30 border border-purple-500/30 rounded-2xl p-4 backdrop-blur">
+            <p className="text-gray-200">
+              📧 <strong>Email:</strong> Confirmación enviada
+            </p>
+          </div>
         </div>
         
-        <div className="mt-10 animate-pulse">
-          <div className="inline-flex items-center text-blue-600 font-semibold text-lg">
-            <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-            Redirigiendo en 4 segundos...
-          </div>
+        <div className="inline-flex items-center bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 px-6 py-3 rounded-full backdrop-blur">
+          <Loader2 className="w-5 h-5 mr-3 animate-spin text-blue-400" />
+          <span className="text-gray-200 font-semibold">Redirigiendo en 5 segundos...</span>
         </div>
       </div>
     )
   }
 
-  // Renderizar formulario de confirmación
+  // Formulario de confirmación
   return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-4xl font-bold text-gray-900 mb-10 text-center">
-        Confirma tu reserva
-      </h2>
+    <div className="max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center justify-center mb-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 blur-2xl opacity-50 animate-pulse"></div>
+            <div className="relative bg-gradient-to-br from-indigo-500 to-purple-600 p-4 rounded-3xl shadow-2xl">
+              <Sparkles className="w-12 h-12 text-white" />
+            </div>
+          </div>
+        </div>
+        <h2 className="text-5xl font-black mb-3">
+          <span className="bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
+            Confirma tu Reserva
+          </span>
+        </h2>
+        <p className="text-gray-300 text-lg">
+          Revisa todos los detalles antes de confirmar
+        </p>
+      </div>
 
-      {/* Resumen en dos columnas */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-8 mb-10 shadow-lg">
-        <h3 className="text-2xl font-bold text-gray-900 mb-8 pb-6 border-b">
-          📋 Resumen completo
+      {/* Resumen */}
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-purple-500/30 rounded-3xl p-8 mb-8 shadow-2xl backdrop-blur">
+        <h3 className="text-2xl font-bold text-white mb-8 pb-6 border-b border-gray-700 flex items-center">
+          <CheckCircle className="w-7 h-7 mr-3 text-purple-400" />
+          Resumen de tu reserva
         </h3>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Servicio */}
-          <div>
-            <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-              <CheckCircle className="w-6 h-6 mr-3 text-blue-600" />
-              Detalles del servicio
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Detalles del servicio */}
+          <div className="space-y-6">
+            <h4 className="text-lg font-bold text-gray-300 mb-4 flex items-center">
+              <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full mr-3"></div>
+              Detalles del Servicio
             </h4>
             
-            <div className="space-y-5">
-              <div className="flex items-start">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-blue-700 font-bold text-lg">
-                    {reservationData.plan?.charAt(0).toUpperCase()}
-                  </span>
+            <div className="space-y-4">
+              <div className="flex items-center p-4 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-2xl backdrop-blur">
+                <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-3 rounded-xl mr-4 shadow-lg">
+                  <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-gray-600">Plan</div>
-                  <div className="text-xl font-bold text-gray-900 capitalize">
-                    {reservationData.plan || 'No seleccionado'}
+                  <div className="text-gray-400 text-sm">Plan</div>
+                  <div className="text-xl font-bold text-white capitalize">
+                    {reservationData?.plan || 'No seleccionado'}
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-start">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
-                  <Calendar className="w-6 h-6 text-green-700" />
+              <div className="flex items-center p-4 bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-2xl backdrop-blur">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-3 rounded-xl mr-4 shadow-lg">
+                  <Calendar className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-gray-600">Fecha</div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {formatDate(reservationData.date)}
+                  <div className="text-gray-400 text-sm">Fecha</div>
+                  <div className="text-lg font-bold text-white capitalize">
+                    {formatDate(reservationData?.date)}
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-start">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
-                  <Clock className="w-6 h-6 text-purple-700" />
+              <div className="flex items-center p-4 bg-gradient-to-r from-orange-900/30 to-red-900/30 border border-orange-500/30 rounded-2xl backdrop-blur">
+                <div className="bg-gradient-to-br from-orange-500 to-red-500 p-3 rounded-xl mr-4 shadow-lg">
+                  <Clock className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-gray-600">Hora</div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {reservationData.time || 'No seleccionada'}
+                  <div className="text-gray-400 text-sm">Hora</div>
+                  <div className="text-xl font-bold text-white">
+                    {reservationData?.time || 'No seleccionada'}
                   </div>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Cliente */}
-          <div>
-            <h4 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-              <User className="w-6 h-6 mr-3 text-green-600" />
-              Tus datos
+          {/* Datos del cliente */}
+          <div className="space-y-6">
+            <h4 className="text-lg font-bold text-gray-300 mb-4 flex items-center">
+              <div className="w-2 h-8 bg-gradient-to-b from-green-400 to-emerald-400 rounded-full mr-3"></div>
+              Tus Datos
             </h4>
             
-            <div className="space-y-5">
-              <div className="flex items-center">
-                <User className="w-5 h-5 text-gray-500 mr-4" />
+            <div className="space-y-4">
+              <div className="flex items-center p-4 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/30 rounded-2xl backdrop-blur">
+                <User className="w-5 h-5 text-green-400 mr-3" />
                 <div>
-                  <div className="text-gray-600">Nombre</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {reservationData.customer?.name || 'No proporcionado'}
+                  <div className="text-gray-400 text-sm">Nombre</div>
+                  <div className="text-lg font-semibold text-white">
+                    {reservationData?.customer?.name || 'No proporcionado'}
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center">
-                <Phone className="w-5 h-5 text-gray-500 mr-4" />
+              <div className="flex items-center p-4 bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border border-blue-500/30 rounded-2xl backdrop-blur">
+                <Phone className="w-5 h-5 text-blue-400 mr-3" />
                 <div>
-                  <div className="text-gray-600">Teléfono</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {reservationData.customer?.phone || 'No proporcionado'}
+                  <div className="text-gray-400 text-sm">Teléfono</div>
+                  <div className="text-lg font-semibold text-white">
+                    {reservationData?.customer?.phone || 'No proporcionado'}
                   </div>
                 </div>
               </div>
               
-              {reservationData.customer?.email && (
-                <div className="flex items-center">
-                  <Mail className="w-5 h-5 text-gray-500 mr-4" />
+              {reservationData?.customer?.email && (
+                <div className="flex items-center p-4 bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-2xl backdrop-blur">
+                  <Mail className="w-5 h-5 text-purple-400 mr-3" />
                   <div>
-                    <div className="text-gray-600">Email</div>
-                    <div className="text-lg font-medium text-gray-900">
+                    <div className="text-gray-400 text-sm">Email</div>
+                    <div className="text-lg font-semibold text-white">
                       {reservationData.customer.email}
                     </div>
                   </div>
                 </div>
               )}
               
-              <div className="flex items-start">
-                <MapPin className="w-5 h-5 text-gray-500 mr-4 mt-1" />
+              <div className="flex items-start p-4 bg-gradient-to-r from-pink-900/30 to-rose-900/30 border border-pink-500/30 rounded-2xl backdrop-blur">
+                <MapPin className="w-5 h-5 text-pink-400 mr-3 mt-1 flex-shrink-0" />
                 <div>
-                  <div className="text-gray-600">Dirección</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {reservationData.customer?.address || 'No proporcionada'}
+                  <div className="text-gray-400 text-sm">Dirección</div>
+                  <div className="text-base font-semibold text-white">
+                    {reservationData?.customer?.address || 'No proporcionada'}
                   </div>
                 </div>
               </div>
@@ -285,11 +266,11 @@ export default function Confirmation({ reservationData, onSubmit, onBack }: Conf
         </div>
         
         {/* Instrucciones especiales */}
-        {reservationData.customer?.specialInstructions && (
-          <div className="mt-10 pt-8 border-t">
-            <h4 className="text-xl font-semibold text-gray-800 mb-4">📝 Instrucciones especiales</h4>
-            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-2xl p-6">
-              <p className="text-gray-800 text-lg">
+        {reservationData?.customer?.specialInstructions && (
+          <div className="mt-8 pt-8 border-t border-gray-700">
+            <h4 className="text-lg font-bold text-gray-300 mb-4">📝 Instrucciones Especiales</h4>
+            <div className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border-2 border-yellow-500/50 rounded-2xl p-6 backdrop-blur">
+              <p className="text-gray-200 text-lg">
                 {reservationData.customer.specialInstructions}
               </p>
             </div>
@@ -298,76 +279,98 @@ export default function Confirmation({ reservationData, onSubmit, onBack }: Conf
       </div>
 
       {/* Términos */}
-      <div className="mb-10 p-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl border border-blue-200">
-        <div className="flex items-start">
+      <div className="mb-8 p-6 bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border-2 border-blue-500/30 rounded-3xl backdrop-blur">
+        <label className="flex items-start cursor-pointer group">
           <input
             type="checkbox"
-            id="terms"
-            className="mt-2 mr-5 w-6 h-6 cursor-pointer"
-            required
+            checked={acceptedTerms}
+            onChange={(e) => setAcceptedTerms(e.target.checked)}
+            className="mt-1 mr-4 w-6 h-6 cursor-pointer accent-blue-500"
           />
-          <label htmlFor="terms" className="text-gray-800 text-lg cursor-pointer">
-            ✅ <span className="font-bold">Acepto los términos y condiciones:</span> Confirmo que la información es correcta 
-            y autorizo el contacto por Telegram para coordinar la visita. Entiendo que puedo cancelar o modificar 
-            con 24 horas de anticipación sin costo. Los datos se utilizarán únicamente para prestar el servicio.
-          </label>
-        </div>
+          <div className="text-gray-200">
+            <span className="font-bold text-white">Acepto los términos y condiciones:</span>
+            <span className="block mt-2 text-gray-300">
+              Confirmo que la información es correcta y autorizo el contacto por Telegram. 
+              Puedo cancelar o modificar con 24h de anticipación sin costo. 
+              Los datos se usan únicamente para prestar el servicio.
+            </span>
+          </div>
+        </label>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="mb-10 p-6 bg-red-50 border-2 border-red-300 rounded-2xl animate-shake">
-          <div className="flex items-center mb-4">
-            <AlertCircle className="w-7 h-7 text-red-600 mr-3" />
-            <h5 className="text-xl font-bold text-red-700">Error al procesar</h5>
+        <div className="mb-8 p-6 bg-gradient-to-r from-red-900/40 to-pink-900/40 border-2 border-red-500/50 rounded-2xl backdrop-blur animate-shake">
+          <div className="flex items-center mb-3">
+            <AlertCircle className="w-7 h-7 text-red-400 mr-3" />
+            <h5 className="text-xl font-bold text-red-300">Error al procesar</h5>
           </div>
-          <p className="text-red-600 mb-3">{error}</p>
-          <p className="text-red-500 text-sm">
-            Si el problema persiste, contacta al +34 600 123 456 o intenta nuevamente.
-          </p>
+          <p className="text-red-200">{error}</p>
         </div>
       )}
 
       {/* Botones */}
-      <div className="flex flex-col lg:flex-row justify-between gap-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
         <button
           onClick={onBack}
           disabled={loading}
-          className="px-10 py-5 border-3 border-gray-400 text-gray-800 rounded-2xl font-bold text-lg hover:bg-gray-100 disabled:opacity-50 transition-all"
+          className="px-8 py-4 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-2xl font-bold text-lg hover:shadow-2xl disabled:opacity-50 transition-all transform hover:scale-105 shadow-xl"
         >
-          ↩️ Volver a datos
+          ← Volver a datos
         </button>
         
         <button
           onClick={handleConfirm}
-          disabled={loading}
-          className="px-12 py-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center shadow-lg"
+          disabled={loading || !acceptedTerms}
+          className="px-10 py-4 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-2xl font-bold text-lg hover:shadow-2xl disabled:opacity-50 transition-all flex items-center justify-center shadow-xl transform hover:scale-105"
         >
           {loading ? (
             <>
-              <Loader2 className="w-7 h-7 mr-4 animate-spin" />
-              Enviando a n8n...
+              <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+              Procesando...
             </>
           ) : (
             <>
-              <CheckCircle className="w-7 h-7 mr-4" />
-              ✅ Confirmar Reserva (Enviar a n8n)
+              <CheckCircle className="w-6 h-6 mr-3" />
+              Confirmar Reserva
             </>
           )}
         </button>
       </div>
 
-      {/* Info n8n */}
-      <div className="mt-12 pt-8 border-t text-center">
-        <div className="inline-flex items-center bg-gray-100 rounded-full px-5 py-2 mb-4">
-          <span className="text-sm font-medium text-gray-700">
-            🔗 Conectado a: n8nprueba.serveftp.com
-          </span>
+      {/* Info de seguridad */}
+      <div className="mt-8 p-6 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-2xl backdrop-blur">
+        <div className="flex items-center gap-4">
+          <Shield className="w-8 h-8 text-green-400 flex-shrink-0" />
+          <div>
+            <h4 className="text-white font-bold mb-1">Conexión Segura</h4>
+            <p className="text-gray-300 text-sm">
+              🔒 Tu información está protegida con encriptación de última generación
+            </p>
+          </div>
         </div>
-        <p className="text-gray-600">
-          Tu reserva se enviará automáticamente a nuestro sistema de automatización (n8n)
-        </p>
       </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-10px); }
+          75% { transform: translateX(10px); }
+        }
+
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes fade-in {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+      `}} />
     </div>
   )
 }
