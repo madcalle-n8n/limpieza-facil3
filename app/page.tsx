@@ -143,9 +143,9 @@ export default function Home() {
               { name: 'Estándar', price: '89€', desc: '8 horas/mes', features: ['Limpieza profunda', 'Productos premium', 'Cocina a fondo', 'Horarios flexibles', 'Prioridad'], popular: true, color: 'from-purple-500 to-pink-500' },
               { name: 'Premium', price: '129€', desc: '12 horas/mes', features: ['Limpieza completa', 'Productos ecológicos', 'Todo incluido', 'Máxima prioridad', 'Inspección mensual', 'Ventanas'], color: 'from-emerald-500 to-teal-500' }
             ].map((plan, idx) => (
-              <div
+            <div
                 key={idx}
-                className={`relative group p-6 sm:p-8 rounded-3xl border-2 backdrop-blur transition-all transform hover:scale-105 ${
+                className={`relative group p-6 sm:p-8 rounded-3xl border-2 backdrop-blur transition-all transform hover:scale-105 flex flex-col ${
                   plan.popular 
                     ? `bg-gradient-to-br from-purple-600/30 to-pink-600/30 border-purple-500/50` 
                     : 'bg-gradient-to-br from-slate-800/50 to-slate-800/50 border-white/10'
