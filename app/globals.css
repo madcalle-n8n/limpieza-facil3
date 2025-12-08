@@ -2,10 +2,11 @@
 
 @import "tailwindcss";
 
-@layer components {
-  .glass {
-    @apply bg-slate-900/70 backdrop-blur-lg;
-  }
+/* Glassmorphism utility - moved before @layer */
+.glass {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* Estilos base */
@@ -111,13 +112,6 @@ body {
 
 .animation-delay-4000 {
   animation-delay: 4s;
-}
-
-/* Glassmorphism */
-.glass {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 /* Scrollbar personalizado */
