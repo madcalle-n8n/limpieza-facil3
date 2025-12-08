@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import { Check, Calendar, Clock, User, Sparkles, CheckCircle } from 'lucide-react'
+import { sendReservationToN8N } from '@/lib/api'
 import PlanSelection from './PlanSelection'
 import DateSelection from './DateSelection'
 import TimeSelection from './TimeSelection'
@@ -63,13 +64,34 @@ export default function BookingWidget() {
   }
 
   const handleSubmitReservation = async () => {
-    try {
-      console.log('✅ Reserva enviada:', reservationData)
-      alert('¡Reserva confirmada!')
-      setCurrentStep(1)
-    } catch (error) {
-      console.error('❌ Error:', error)
+    const payload = {
+      ...reservationData,
+      date: reservationData.date ? reservationData.date.toISOString() : '',
     }
+
+    const result = await sendReservationToN8N(payload)
+
+    if (!result.success) {
+      throw new Error(result.error || 'Error al procesar la reserva')
+    }
+
+    // Limpieza de estado tras confirmar
+    setReservationData({
+      plan: '',
+      date: null,
+      time: '',
+      customer: {
+        name: '',
+        phone: '',
+        email: '',
+        address: '',
+        specialInstructions: '',
+        accessibilityNeeds: false
+      }
+    })
+    setCurrentStep(1)
+
+    return result
   }
 
   const renderStepContent = () => {

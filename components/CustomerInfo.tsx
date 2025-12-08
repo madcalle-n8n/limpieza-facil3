@@ -15,9 +15,19 @@ export default function CustomerInfo({ customerData = {}, onUpdate, onNext, onBa
 
   useEffect(() => {
     const newErrors: { [key: string]: string } = {};
+    const phoneRegex = /^[+]?[\d\s-]{6,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!customerData.name?.trim()) newErrors.name = 'Requerido';
-    if (!customerData.phone?.trim()) newErrors.phone = 'Requerido';
+    if (!customerData.phone?.trim()) {
+      newErrors.phone = 'Requerido';
+    } else if (!phoneRegex.test(customerData.phone)) {
+      newErrors.phone = 'Teléfono inválido';
+    }
     if (!customerData.address?.trim()) newErrors.address = 'Requerido';
+    if (customerData.email && !emailRegex.test(customerData.email)) {
+      newErrors.email = 'Email inválido';
+    }
     setErrors(newErrors);
   }, [customerData]);
 
@@ -73,6 +83,7 @@ export default function CustomerInfo({ customerData = {}, onUpdate, onNext, onBa
               className="w-full p-3 bg-slate-800/70 border-2 border-slate-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-pink-400 transition-all"
               placeholder="juan@example.com"
             />
+            {errors.email && <p className="text-red-400 text-xs mt-1 animate-fade-in">{errors.email}</p>}
           </div>
 
           {/* Dirección */}

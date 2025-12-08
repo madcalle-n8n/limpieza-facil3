@@ -5,7 +5,7 @@ import { CheckCircle, AlertCircle, Loader2, Calendar, Clock, User, Phone, MapPin
 
 interface ConfirmationProps {
   reservationData?: any
-  onSubmit?: () => void
+  onSubmit?: () => Promise<any>
   onBack?: () => void
 }
 
@@ -36,34 +36,26 @@ export default function Confirmation({ reservationData, onSubmit, onBack }: Conf
       setError('Debes aceptar los términos y condiciones');
       return;
     }
+
+    // Validaciones mínimas para evitar requests inválidos
+    if (!reservationData?.plan || !reservationData?.date || !reservationData?.time) {
+      setError('Faltan datos obligatorios de la reserva (plan, fecha u hora)');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       console.log('📤 Enviando reserva...');
-      const dataToSend = {
-        plan: reservationData?.plan,
-        date: reservationData?.date instanceof Date 
-          ? reservationData.date.toISOString() 
-          : reservationData?.date,
-        time: reservationData?.time,
-        customer: reservationData?.customer
-      };
-      console.log('📦 Datos a enviar:', dataToSend);
-      const response = await fetch('/api/reserva', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend)
-      });
-      console.log('📡 Respuesta status:', response.status);
-      const result = await response.json();
-      console.log('✅ Respuesta completa:', result);
-      if (!response.ok) {
-        throw new Error(result.error || `Error ${response.status}`);
+      const result = onSubmit ? await onSubmit() : null;
+      if (result && result.reservation_id) {
+        setReservationId(result.reservation_id);
+      } else {
+        setReservationId(`RES-${Date.now()}`);
       }
-      setReservationId(result.reservation_id || `RES-${Date.now()}`);
       setSuccess(true);
       setTimeout(() => {
-        if (onSubmit) onSubmit();
+        // El estado se limpia en el onSubmit provisto
       }, 3000);
     } catch (err: any) {
       console.error('❌ Error:', err);

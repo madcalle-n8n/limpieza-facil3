@@ -6,10 +6,22 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   console.log('📥 API Route POST: Reserva recibida')
-  
+
   try {
     const body = await request.json()
-    console.log('📦 Datos recibidos:', JSON.stringify(body, null, 2))
+    const safeLog = {
+      plan: body?.plan,
+      date: body?.date,
+      time: body?.time,
+      customer: {
+        // Evitamos registrar PII completa
+        name: body?.customer?.name ? '***' : undefined,
+        phone: body?.customer?.phone ? '***' : undefined,
+        email: body?.customer?.email ? '***' : undefined,
+        address: body?.customer?.address ? '***' : undefined,
+      }
+    }
+    console.log('📦 Datos recibidos (sanitizado):', JSON.stringify(safeLog, null, 2))
     
     // URL de n8n desde variables de entorno
     // Permitimos fallback a la variante pública para entornos locales mal configurados
@@ -70,7 +82,14 @@ export async function POST(request: NextRequest) {
       success: true,
       reservation_id: jsonResponse.reservation_id || `RES-${Date.now()}`,
       ...jsonResponse
-    }, { status: 200 })
+    }, { 
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    })
 
   } catch (error: any) {
     console.error('❌ Error completo:', error)
@@ -82,7 +101,14 @@ export async function POST(request: NextRequest) {
         error: error.message,
         hint: 'Verifica la URL de n8n y que el webhook esté activo'
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
+      }
     )
   }
 }

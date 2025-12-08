@@ -13,6 +13,7 @@ export interface ReservationData {
     email?: string
     address: string
     specialInstructions?: string
+    accessibilityNeeds?: boolean
   }
 }
 
