@@ -71,6 +71,18 @@ export default function TimeSelection({
     return 'evening'
   }
 
+  useEffect(() => {
+    // Mantener el estado local sincronizado si el padre cambia selectedTime
+    setLocalSelectedTime(selectedTime || '')
+  }, [selectedTime])
+
+  useEffect(() => {
+    // Si cambia la fecha seleccionada en el padre, reseteamos la hora local
+    // para evitar que quede una hora de otro día
+    setLocalSelectedTime('')
+    if (onSelectTime) onSelectTime('')
+  }, [selectedDate, onSelectTime])
+
   return (
     <div className="max-w-5xl mx-auto">
       {/* Header con animación */}

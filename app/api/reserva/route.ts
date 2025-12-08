@@ -5,97 +5,95 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
-  console.log('📥 API Route recibió petición')
+  console.log('📥 API Route POST: Reserva recibida')
   
   try {
-    // Leer los datos que envió el frontend
     const body = await request.json()
-    console.log('📦 Datos recibidos del frontend:', body)
+    console.log('📦 Datos recibidos:', JSON.stringify(body, null, 2))
     
-    // Tu código actual:
-// ... (resto del código igual)
-
-    // URL del webhook de n8n - Prioriza variables, pero el fallback debe ser CORRECTO
-    // IMPORTANTE: Si estás probando, usa 'webhook-test'. Si es producción, usa 'webhook'.
-    const WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 
+    // URL de n8n desde variables de entorno
+    // Permitimos fallback a la variante pública para entornos locales mal configurados
+    const WEBHOOK_URL =
       process.env.N8N_WEBHOOK_URL ||
-      'https://n8nprueba.serveftp.com/webhook-test/api/reserva'; // <--- CORREGIDO
+      process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ||
+      'https://n8nprueba.serveftp.com/webhook/api/reserva'
     
-    console.log('🔗 Enviando a n8n:', WEBHOOK_URL)
-
-// ... (resto del código igual)
+    console.log('🔍 URL Webhook:', WEBHOOK_URL)
     
-    // Hacer la petición a n8n desde el servidor (sin CORS)
-    const response = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        reservationData: body,
-        timestamp: new Date().toISOString(),
-        source: 'web-frontend-proxy'
-      })
-    })
-    
-    console.log('📡 Respuesta de n8n - Status:', response.status)
-    
-    // Leer la respuesta de n8n
-    const textResponse = await response.text()
-    console.log('📄 Respuesta de n8n - Texto:', textResponse)
-    
-    // Si n8n respondió con error HTTP
-    if (!response.ok) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Error de n8n: ${response.status}`,
-          details: textResponse 
-        },
-        { status: response.status }
+    if (!WEBHOOK_URL) {
+      throw new Error(
+        'N8N_WEBHOOK_URL no está configurada. Añade N8N_WEBHOOK_URL=https://n8nprueba.serveftp.com/webhook/api/reserva en frontend/.env.local y reinicia el servidor.'
       )
     }
+
+    console.log('🔗 Enviando datos a n8n...')
+
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        ...body,
+        timestamp: new Date().toISOString(),
+        source: 'limpieza-facil-app'
+      })
+    })
+
+    console.log('📡 Status de respuesta:', response.status, response.statusText)
     
-    // Intentar parsear la respuesta como JSON
-    let jsonResponse
+    const responseText = await response.text()
+    console.log('📡 Respuesta raw:', responseText)
+    
+    if (!response.ok) {
+      console.error('❌ Error de n8n - Status:', response.status)
+      console.error('❌ Respuesta de error:', responseText)
+      throw new Error(`n8n error ${response.status}: ${responseText || response.statusText}`)
+    }
+
+    let jsonResponse: any = {}
     try {
-      jsonResponse = textResponse ? JSON.parse(textResponse) : {}
+      jsonResponse = responseText ? JSON.parse(responseText) : {}
     } catch (e) {
-      // Si n8n no devolvió JSON pero respondió OK
+      console.log('⚠️ No se pudo parsear JSON, usando valores por defecto')
       jsonResponse = {
         success: true,
-        reservation_id: `N8N-${Date.now()}`,
-        message: 'Reserva procesada (n8n no devolvió JSON)'
+        reservation_id: `RES-${Date.now()}`,
+        message: 'Reserva procesada correctamente'
       }
     }
+
+    console.log('✅ Reserva exitosa:', jsonResponse)
     
-    console.log('✅ Respuesta exitosa de n8n')
-    
-    // Devolver la respuesta al frontend
-    return NextResponse.json(jsonResponse)
-    
+    return NextResponse.json({
+      success: true,
+      reservation_id: jsonResponse.reservation_id || `RES-${Date.now()}`,
+      ...jsonResponse
+    }, { status: 200 })
+
   } catch (error: any) {
-    console.error('❌ Error en API Route:', error)
+    console.error('❌ Error completo:', error)
+    console.error('❌ Error mensaje:', error.message)
     
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error.message || 'Error al procesar la reserva',
-        details: error.toString()
+      {
+        success: false,
+        error: error.message,
+        hint: 'Verifica la URL de n8n y que el webhook esté activo'
       },
       { status: 500 }
     )
   }
 }
 
-// Manejar peticiones OPTIONS (preflight de CORS)
 export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
+  return new NextResponse(null, { 
     status: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
+      'Access-Control-Allow-Headers': 'Content-Type'
+    }
   })
 }

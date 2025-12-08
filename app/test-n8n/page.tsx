@@ -2,136 +2,140 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, XCircle, Wifi, Server } from 'lucide-react'
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 
-export default function TestN8NPage() {
+export default function TestN8nPage() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const testN8N = async () => {
+  const handleTest = async () => {
     setLoading(true)
-    
+    setError(null)
+    setResult(null)
+
     try {
-      const testData = {
-        test: true,
-        message: "Prueba de conexión desde Limpieza Fácil",
-        timestamp: new Date().toISOString(),
-        source: "test-page"
+      const response = await fetch('/api/test-n8n')
+      const data = await response.json()
+
+      if (response.ok) {
+        setResult(data)
+      } else {
+        setError(data.error || 'Error desconocido')
+        setResult(data)
       }
-
-      const response = await fetch('https://n8nprueba.serveftp.com/webhook/reserva', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testData)
-      })
-
-      setResult({
-        success: response.ok,
-        status: response.status,
-        statusText: response.statusText,
-        url: 'https://n8nprueba.serveftp.com/webhook/reserva',
-        timestamp: new Date().toLocaleTimeString()
-      })
-
-    } catch (error: any) {
-      setResult({
-        success: false,
-        error: error.message,
-        url: 'https://n8nprueba.serveftp.com/webhook/reserva'
-      })
+    } catch (err: any) {
+      setError(err.message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-10 flex items-center">
-          <Server className="w-10 h-10 mr-4 text-blue-600" />
-          Prueba de Conexión n8n
+    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 pt-32 pb-20 px-4">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-5xl font-black text-center mb-4">
+          <span className="bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+            Test de Conexión n8n
+          </span>
         </h1>
-        
-        <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-gray-200">
-          <div className="flex items-center mb-6">
-            <Wifi className="w-8 h-8 mr-3 text-blue-500" />
-            <h2 className="text-2xl font-bold text-gray-800">Estado de conexión</h2>
-          </div>
-          
-          <div className="space-y-4 mb-8">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-              <span className="font-medium">URL de n8n:</span>
-              <code className="bg-blue-100 text-blue-800 px-3 py-1 rounded">
-                n8nprueba.serveftp.com
-              </code>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-              <span className="font-medium">Endpoint:</span>
-              <code className="bg-green-100 text-green-800 px-3 py-1 rounded">
-                /webhook/reserva
-              </code>
-            </div>
-          </div>
 
+        <p className="text-center text-gray-300 mb-12 text-lg">
+          Verifica que tu webhook de n8n esté funcionando correctamente
+        </p>
+
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 border border-purple-500/30 shadow-2xl backdrop-blur mb-8">
           <button
-            onClick={testN8N}
+            onClick={handleTest}
             disabled={loading}
-            className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 flex items-center justify-center"
+            className="w-full px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl font-bold text-lg hover:shadow-2xl disabled:opacity-50 transition-all flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                Probando conexión...
+                <Loader2 className="w-6 h-6 animate-spin" />
+                Probando...
               </>
             ) : (
-              <>
-                <Wifi className="w-6 h-6 mr-3" />
-                Probar Conexión con n8n
-              </>
+              'Probar Conexión'
             )}
           </button>
         </div>
 
-        {result && (
-          <div className={`rounded-3xl p-8 border-2 ${
-            result.success 
-              ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300' 
-              : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300'
-          }`}>
-            <div className="flex items-center mb-6">
-              {result.success ? (
-                <CheckCircle className="w-10 h-10 text-green-600 mr-4" />
-              ) : (
-                <XCircle className="w-10 h-10 text-red-600 mr-4" />
-              )}
-              <h3 className="text-2xl font-bold">
-                {result.success ? '✅ Conexión Exitosa' : '❌ Error de Conexión'}
-              </h3>
+        {/* Resultado exitoso */}
+        {result && !error && (
+          <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 rounded-3xl p-8 border-2 border-green-500/50 shadow-2xl backdrop-blur mb-8">
+            <div className="flex items-start gap-4 mb-6">
+              <CheckCircle className="w-8 h-8 text-green-400 flex-shrink-0 mt-1" />
+              <div>
+                <h2 className="text-2xl font-bold text-green-300 mb-2">¡Conexión Exitosa! ✅</h2>
+                <p className="text-green-200 mb-4">El webhook de n8n está funcionando correctamente.</p>
+              </div>
             </div>
-            
-            <pre className="bg-black/5 p-6 rounded-xl overflow-auto text-sm">
-              {JSON.stringify(result, null, 2)}
-            </pre>
-            
-            <div className="mt-6 text-center text-gray-600">
-              {result.success 
-                ? '🎉 Tu n8n está listo para recibir reservas desde Limpieza Fácil'
-                : '⚠️ Verifica que tu n8n esté corriendo y sea accesible desde internet'}
+
+            <div className="bg-slate-900/50 rounded-xl p-4 text-sm font-mono text-gray-300 overflow-auto max-h-48">
+              <pre>{JSON.stringify(result, null, 2)}</pre>
             </div>
           </div>
         )}
 
-        <div className="mt-10 p-6 bg-blue-50 rounded-2xl border border-blue-200">
-          <h4 className="text-lg font-bold text-blue-900 mb-3">📋 Próximos pasos</h4>
-          <ol className="list-decimal pl-5 space-y-2 text-blue-800">
-            <li>Verifica que el botón "Confirmar Reserva" funcione</li>
-            <li>Revisa los logs de tu n8n para ver las reservas entrantes</li>
-            <li>Configura las respuestas automáticas de Telegram</li>
-            <li>Prueba el flujo completo: Web → n8n → Google Calendar → Telegram</li>
-          </ol>
+        {/* Error */}
+        {error && (
+          <div className="bg-gradient-to-br from-red-900/40 to-pink-900/40 rounded-3xl p-8 border-2 border-red-500/50 shadow-2xl backdrop-blur mb-8">
+            <div className="flex items-start gap-4 mb-6">
+              <AlertCircle className="w-8 h-8 text-red-400 flex-shrink-0 mt-1" />
+              <div>
+                <h2 className="text-2xl font-bold text-red-300 mb-2">Error de Conexión ❌</h2>
+                <p className="text-red-200 mb-4">{error}</p>
+              </div>
+            </div>
+
+            {result && (
+              <div className="bg-slate-900/50 rounded-xl p-4 text-sm font-mono text-gray-300 overflow-auto max-h-48">
+                <pre>{JSON.stringify(result, null, 2)}</pre>
+              </div>
+            )}
+
+            <div className="mt-6 p-4 bg-yellow-900/30 border border-yellow-500/50 rounded-xl">
+              <h3 className="font-bold text-yellow-300 mb-2">📋 Checklist de solución:</h3>
+              <ul className="text-yellow-200 text-sm space-y-2">
+                <li>✓ Verifica que el archivo <code className="bg-slate-900 px-2 py-1 rounded">.env.local</code> exista en la carpeta frontend</li>
+                <li>✓ Comprueba que <code className="bg-slate-900 px-2 py-1 rounded">N8N_WEBHOOK_URL</code> sea correcta</li>
+                <li>✓ Verifica que el webhook esté activo en n8n</li>
+                <li>✓ Comprueba la conectividad a internet</li>
+                <li>✓ Reinicia el servidor Next.js: <code className="bg-slate-900 px-2 py-1 rounded">npm run dev</code></li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Información útil */}
+        <div className="bg-gradient-to-br from-blue-900/40 to-indigo-900/40 rounded-3xl p-8 border-2 border-blue-500/50 shadow-2xl backdrop-blur">
+          <h2 className="text-2xl font-bold text-blue-300 mb-4">📌 Información de Configuración</h2>
+          
+          <div className="space-y-4 text-blue-200 text-sm">
+            <div className="bg-slate-900/50 rounded-xl p-4">
+              <p className="font-bold text-blue-300 mb-2">1️⃣ Archivo .env.local:</p>
+              <code className="text-xs block bg-slate-800 p-3 rounded text-gray-300 overflow-auto">
+                N8N_WEBHOOK_URL=https://tu-dominio/webhook/limpieza-reserva
+              </code>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-xl p-4">
+              <p className="font-bold text-blue-300 mb-2">2️⃣ Ubicación correcta:</p>
+              <code className="text-xs block text-gray-300">
+                frontend/.env.local
+              </code>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-xl p-4">
+              <p className="font-bold text-blue-300 mb-2">3️⃣ Después de crear/editar:</p>
+              <code className="text-xs block text-gray-300">
+                Reinicia el servidor: npm run dev
+              </code>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

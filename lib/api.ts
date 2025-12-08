@@ -82,9 +82,15 @@ export async function sendReservationToN8N(data: ReservationData): Promise<N8NRe
 
     // Validar respuesta de error HTTP
     if (!response.ok) {
+      const hint =
+        jsonResponse?.hint ||
+        (jsonResponse?.error?.includes('N8N_WEBHOOK_URL')
+          ? 'Configura N8N_WEBHOOK_URL o revisa el fallback en route.ts'
+          : undefined)
       throw new Error(
         jsonResponse.error || 
         jsonResponse.message || 
+        hint || 
         `Error HTTP ${response.status}`
       )
     }

@@ -10,13 +10,14 @@ export default function AccessibilityBar() {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    document.body.className = document.body.className.replace(/font-size-\w+/g, '')
-    document.body.classList.add(`font-size-${fontSize}`)
+    const body = document.body
+    body.className = body.className.replace(/font-size-\w+/g, '')
+    body.classList.add(`font-size-${fontSize}`)
     
     if (highContrast) {
-      document.body.classList.add('high-contrast')
+      body.classList.add('high-contrast')
     } else {
-      document.body.classList.remove('high-contrast')
+      body.classList.remove('high-contrast')
     }
   }, [fontSize, highContrast])
 
@@ -29,14 +30,12 @@ export default function AccessibilityBar() {
             Accesibilidad
           </div>
 
-          <div className="flex gap-4 items-center">
-            <button 
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-xs px-3 py-1 bg-purple-700 hover:bg-purple-600 rounded transition-colors"
-            >
-              {isOpen ? 'Ocultar' : 'Mostrar'}
-            </button>
-          </div>
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-xs px-3 py-1 bg-purple-700 hover:bg-purple-600 rounded transition-colors"
+          >
+            {isOpen ? 'Ocultar' : 'Mostrar'}
+          </button>
         </div>
 
         {isOpen && (
@@ -48,9 +47,9 @@ export default function AccessibilityBar() {
                 onChange={(e) => setFontSize(e.target.value as any)}
                 className="text-sm bg-purple-700 border border-purple-600 rounded px-2 py-1 text-white cursor-pointer"
               >
-                <option value="normal">Texto Normal</option>
-                <option value="large">Texto Grande</option>
-                <option value="xlarge">Texto Muy Grande</option>
+                <option value="normal">Normal</option>
+                <option value="large">Grande</option>
+                <option value="xlarge">Muy Grande</option>
               </select>
             </div>
 
@@ -58,12 +57,12 @@ export default function AccessibilityBar() {
               onClick={() => setHighContrast(!highContrast)}
               className={`flex items-center gap-2 px-3 py-1 rounded text-sm transition-all ${
                 highContrast 
-                  ? 'bg-orange-600 hover:bg-orange-700' 
-                  : 'bg-purple-700 hover:bg-purple-600'
+                  ? 'bg-orange-600' 
+                  : 'bg-purple-700'
               }`}
             >
               <Contrast className="w-4 h-4" />
-              {highContrast ? 'Alto Contraste: ON' : 'Alto Contraste: OFF'}
+              {highContrast ? 'ON' : 'OFF'}
             </button>
           </div>
         )}

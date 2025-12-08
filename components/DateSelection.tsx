@@ -111,6 +111,13 @@ export default function DateSelection({
     }
   }, [selectedDate, onSelectDate])
 
+  useEffect(() => {
+    // Sincroniza el calendario con la fecha que venga del padre
+    if (selectedDate && !isSameMonth(selectedDate, currentMonth)) {
+      setCurrentMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
+    }
+  }, [selectedDate, currentMonth])
+
   // Agrupar días por semanas
   const weeks: (Date | null)[][] = []
   for (let i = 0; i < days.length; i += 7) {

@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
+  env: {
+    N8N_WEBHOOK_URL: process.env.N8N_WEBHOOK_URL,
+  },
 };
 
 export default nextConfig;

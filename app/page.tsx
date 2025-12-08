@@ -5,9 +5,10 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <>
+    <div className="flex flex-col w-full"> {/* Añadido w-full y flex-col para asegurar estructura */}
+      
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 w-full">
         {/* Animated Background Blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -15,7 +16,8 @@ export default function Home() {
           <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-8 text-center">
+        {/* Añadido w-full al contenedor principal para asegurar centrado */}
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 md:px-8 text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-gradient-to-r from-orange-500/10 to-pink-500/10 border border-orange-500/30 rounded-full backdrop-blur-xl">
             <Sparkles className="w-4 h-4 text-orange-400" />
@@ -51,15 +53,15 @@ export default function Home() {
             </div>
           </div>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Corregidos enlaces */}
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
             <Link href="/reservar" className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl font-bold text-lg hover:shadow-2xl transform hover:scale-105 transition-all shadow-xl flex items-center justify-center gap-2">
               Reservar Ahora
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button className="px-8 py-4 border-2 border-purple-400/50 text-purple-300 rounded-xl font-bold text-lg hover:bg-purple-400/10 transition-all backdrop-blur">
+            <Link href="/#planes" className="px-8 py-4 border-2 border-purple-400/50 text-purple-300 rounded-xl font-bold text-lg hover:bg-purple-400/10 transition-all backdrop-blur flex items-center justify-center">
               Ver Planes
-            </button>
+            </Link>
           </div>
 
           {/* Stats */}
@@ -87,8 +89,8 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="relative py-20 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
+      <section id="features" className="relative py-20 px-4 md:px-8 w-full">
+        <div className="max-w-6xl mx-auto w-full">
           <h2 className="text-4xl md:text-5xl font-black text-center mb-4">
             <span className="bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
               ¿Por qué elegirnos?
@@ -124,8 +126,8 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="relative py-20 px-4 md:px-8" id="booking">
-        <div className="max-w-6xl mx-auto">
+      <section id="planes" className="relative py-20 px-4 md:px-8 w-full">
+        <div className="max-w-6xl mx-auto w-full">
           <h2 className="text-4xl md:text-5xl font-black text-center mb-4">
             <span className="bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
               Elige tu Plan
@@ -158,7 +160,7 @@ export default function Home() {
                 )}
                 
                 <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                <p className="text-4xl font-black bg-gradient-to-r ${plan.color} bg-clip-text text-transparent mb-1">
+                <p className={`text-4xl font-black bg-gradient-to-r ${plan.color} bg-clip-text text-transparent mb-1`}>
                   {plan.price}
                 </p>
                 <p className="text-gray-400 mb-6">{plan.desc}</p>
@@ -172,13 +174,13 @@ export default function Home() {
                   ))}
                 </ul>
 
-<Link href="/reservar" className={`block w-full py-3 rounded-lg font-bold transition-all text-center ${
-  plan.popular
-    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
-    : 'bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:shadow-lg'
-}`}>
-  Seleccionar
-</Link>
+                <Link href="/reservar" className={`block w-full py-3 rounded-lg font-bold transition-all text-center ${
+                  plan.popular
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+                    : 'bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:shadow-lg'
+                }`}>
+                  Seleccionar
+                </Link>
               </div>
             ))}
           </div>
@@ -186,8 +188,8 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section className="relative py-20 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-20 px-4 md:px-8 w-full">
+        <div className="max-w-6xl mx-auto w-full">
           <div className="relative p-12 rounded-3xl bg-gradient-to-r from-slate-800/50 to-slate-800/50 border border-purple-500/20 backdrop-blur-xl overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-purple-600/10 rounded-3xl"></div>
             
@@ -218,6 +220,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }
