@@ -202,9 +202,9 @@ export default function Home() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
                 {[
-                  { icon: '📞', title: 'Teléfono', value: '+34 600 123 456', desc: '24/7' },
-                  { icon: '💬', title: 'Telegram', value: '@LimpiezaFacilBot', desc: '5 min respuesta' },
-                  { icon: '📧', title: 'Email', value: 'info@limpiezafacil.es', desc: '2h respuesta' }
+                  { icon: '📞', title: 'Teléfono', value: '+34 662473782', desc: '24/7' },
+                  { icon: '💬', title: 'Telegram', value: '@Limpieza_en_mi_hogar_bot', desc: '5 min respuesta' },
+                  { icon: '📧', title: 'Email', value: 'miempresan8n@gmail.com', desc: '2h respuesta' }
                 ].map((contact, idx) => (
                   <div key={idx} className="text-center group hover:scale-110 transition-transform">
                     <div className="text-4xl sm:text-5xl mb-4">{contact.icon}</div>
